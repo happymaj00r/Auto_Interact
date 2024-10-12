@@ -18,10 +18,15 @@ local function matchesAnyPattern(skin_name, extra)
     return false
 end
 
+
+
+
+
 on_render_menu(function()
     if not menu.main_tree:push("Auto Interact") then
         return;
     end;
+	
 	menu.main_boolean:render("Enable Plugin", "");
 	if menu.main_boolean:get() == false then
       -- plugin not enabled, stop rendering menu elements
@@ -30,9 +35,17 @@ on_render_menu(function()
     end;
     menu.main_openContainers:render("Open Containers", "");
     menu.main_showContainers:render("Show Containers", "");
+	menu.main_walkToShrine:render("Walk To Shrine","")
+	if menu.main_walkToShrine:get() then
+		menu.main_walkDistance:render("Distance", "Set the max distance", 1)
+	end
 	menu.main_tree:pop();
 
 end)
+
+
+
+
 
 
 
@@ -62,6 +75,13 @@ on_update(function()
         local distanceThreshold = 1.5 -- Default
         if skin_name:match("Shrine") then
             distanceThreshold = 2.5
+			if menu.main_walkToShrine:get() then
+				if position:dist_to(playerPos) < menu.main_walkDistance:get() then
+					pathfinder.request_move(position)
+				end				
+			end
+			
+			
         elseif skin_name:match("Gate") then
             distanceThreshold = 1.5
         elseif not matchesAnyPattern(skin_name) then
